@@ -1,7 +1,3 @@
-using Bookify.Web.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-
 namespace Bookify.Web
 {
     public class Program
