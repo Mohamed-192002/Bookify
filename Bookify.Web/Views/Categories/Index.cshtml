@@ -39,10 +39,42 @@
                 <!--end::Svg Icon-->
                 <!--begin::Content-->
                 <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
-                    <h5 class="mb-1">No Categories Found</h5>
+                    <h5 class="mb-1">No Categories Found!</h5>
                 </div>
                 <!--end::Content-->
-               
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-rounded table-striped border gy-7 gs-7">
+                    <thead>
+                        <tr class="fw-semibold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            <th>Last Updated On</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>
+                                    <span class="badge badge-light-@(item.IsDeleted? "danger":"success")">@(item.IsDeleted ? "Deleted" : "Available")</span>
+                                </td>
+                                <td>@item.CreatedOn</td>
+                                <td>@item.LastUpdatedOn</td>
+                                <td>
+                                    <a aasp-controller="Categories" asp-action="Edit" asp-route-Id="@item.Id" class="btn btn-sm btn-light-info">Edit</a>
+                                    <a aasp-controller="Categories" asp-action="Delete" asp-route-Id="@item.Id" class="btn btn-sm btn-light-danger">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         }
 
