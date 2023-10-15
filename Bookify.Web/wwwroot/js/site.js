@@ -37,6 +37,7 @@ function OnModelSuccess(item) {
     datatable.row.add(NewRow).draw();
 
     KTMenu.init();
+    KTMenu.initHandlers();
     KTMenu.initGlobalHandlers();
 }
 

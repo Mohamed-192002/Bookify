@@ -5,7 +5,7 @@
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
 
-        public CategoriesController(ApplicationDbContext _context,IMapper _mapper)
+        public CategoriesController(ApplicationDbContext _context, IMapper _mapper)
         {
             context = _context;
             mapper = _mapper;
@@ -69,16 +69,15 @@
             var category = context.Categories.Find(id);
             if (category == null)
                 return NotFound();
-            category.IsDeleted=!category.IsDeleted;
+            category.IsDeleted = !category.IsDeleted;
             category.LastUpdatedOn = DateTime.Now;
             context.SaveChanges();
             return Ok(category.LastUpdatedOn.ToString());
         }
         public IActionResult AllowCategory(CategoryFormViewModel viewModel)
         {
-            var isExist=context.Categories.Any(c=>c.Name == viewModel.Name);
+            var isExist = context.Categories.Any(c => c.Name == viewModel.Name);
             return Json(!isExist);
         }
     }
 }
-  
