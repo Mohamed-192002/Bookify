@@ -1,8 +1,4 @@
-﻿using Bookify.Web.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
-namespace Bookify.Web.Controllers
+﻿namespace Bookify.Web.Controllers
 {
     public class HomeController : Controller
     {

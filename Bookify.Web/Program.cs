@@ -15,6 +15,8 @@ namespace Bookify.Web
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
+            // Resolve AutoMapper
+            builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
 
             var app = builder.Build();
 

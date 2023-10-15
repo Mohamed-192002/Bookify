@@ -10,7 +10,7 @@
 				<!--begin:Menu item-->
 				<div class="menu-item ">
 					<!--begin:Menu link-->
-					<a class="menu-link active" asp-controller="Home" asp-action="Index">
+					<a class="menu-link" active-when="Home" asp-controller="Home" asp-action="Index">
 						<span class="menu-icon">
 							<!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/general/gen001.svg-->
 							<span class="svg-icon svg-icon-muted svg-icon-2hx">
@@ -24,7 +24,7 @@
 					</a>
 					<!--end:Menu link-->
 					<!--begin:Menu link-->
-					<a class="menu-link " asp-controller="Categories" asp-action="Index">
+					<a class="menu-link " active-when="Categories" asp-controller="Categories" asp-action="Index">
 						<span class="menu-icon">
 							<!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/abstract/abs027.svg-->
 							<span class="svg-icon svg-icon-muted svg-icon-2hx">
@@ -49,3 +49,10 @@
 
 </div>
 <!--end::Aside-->
+@section Scripts{
+	<script>
+		$(document).ready(function () {
+			
+		});
+	</script>
+}
