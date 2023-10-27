@@ -1,3 +1,5 @@
+using UoN.ExpressiveAnnotations.NetCore.DependencyInjection;
+
 namespace Bookify.Web
 {
     public class Program
@@ -17,7 +19,7 @@ namespace Bookify.Web
             builder.Services.AddControllersWithViews();
             // Resolve AutoMapper
             builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
-
+            builder.Services.AddExpressiveAnnotations();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -1,4 +1,6 @@
-﻿namespace Bookify.Web.Core.Mapping
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Bookify.Web.Core.Mapping
 {
     public class MappingProfile : Profile
     {
@@ -7,10 +9,23 @@
             // Category
             CreateMap<Category, CategoryViewModel>();
             CreateMap<Category, CategoryFormViewModel>().ReverseMap();
+            CreateMap<Category, SelectListItem>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
+                .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
+
 
             // Author
             CreateMap<Author, AuthorViewModel>();
             CreateMap<Author, AuthorFormViewModel>().ReverseMap();
+            CreateMap<Author, SelectListItem>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
+                .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
+
+            // Book
+            CreateMap<BookFormViewModel, Book>()
+                .ReverseMap()
+                .ForMember(dest => dest.Categories, opt => opt.Ignore());
+
         }
     }
 }
