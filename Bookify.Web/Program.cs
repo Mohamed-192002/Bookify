@@ -1,3 +1,4 @@
+using Bookify.Web.Settings;
 using UoN.ExpressiveAnnotations.NetCore.DependencyInjection;
 
 namespace Bookify.Web
@@ -13,6 +14,8 @@ namespace Bookify.Web
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            // Map Cloudinary Settings
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();

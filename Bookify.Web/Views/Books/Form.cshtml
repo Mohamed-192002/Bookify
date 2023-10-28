@@ -26,7 +26,7 @@
                 <input type="hidden" asp-for="Id" />
             }
             <!--begin::Image input-->
-            <div class="image-input image-input-empty mb-6" data-kt-image-input="true" style="background-image: url(/Images/@(string.IsNullOrEmpty(Model.ImageUrl)?"image-placeholder.jpg":$"Books/{Model.ImageUrl}"))">
+            <div class="image-input image-input-empty mb-6" data-kt-image-input="true" style="background-image: url(@(string.IsNullOrEmpty(Model.ImageUrl)?"/Images/image-placeholder.jpg":Model.ImageUrl))">
                 <!--begin::Image preview wrapper-->
                 <div class="image-input-wrapper w-125px h-200px"></div>
                 <!--end::Image preview wrapper-->

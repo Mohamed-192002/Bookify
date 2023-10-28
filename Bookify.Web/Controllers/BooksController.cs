@@ -1,6 +1,10 @@
 ﻿using Bookify.Web.Core.Models;
+using Bookify.Web.Settings;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Options;
 
 namespace Bookify.Web.Controllers
 {
@@ -9,13 +13,21 @@ namespace Bookify.Web.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly Cloudinary cloudinary;
         private List<string> allowedExtensionsImage = new() { ".jpg", ".png", ".jpeg" };
         private int maxSizeForImage = 2097152;
-        public BooksController(ApplicationDbContext _context, IMapper _mapper, IWebHostEnvironment _webHostEnvironment)
+        public BooksController(ApplicationDbContext _context, IMapper _mapper, IWebHostEnvironment _webHostEnvironment, IOptions<CloudinarySettings> _cloudinary)
         {
             context = _context;
             mapper = _mapper;
             webHostEnvironment = _webHostEnvironment;
+            Account account = new()
+            {
+                ApiKey = _cloudinary.Value.ApiKey,
+                ApiSecret = _cloudinary.Value.ApiSecret,
+                Cloud = _cloudinary.Value.Cloud,
+            };
+            cloudinary = new Cloudinary(account);
         }
         public IActionResult Index()
         {
@@ -29,7 +41,7 @@ namespace Bookify.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(BookFormViewModel model)
+        public async Task<IActionResult> Create(BookFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -53,10 +65,21 @@ namespace Bookify.Web.Controllers
                     var viewModel = PopulateViewModel(model);
                     return View("Form", viewModel);
                 }
-                var path = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.Image.FileName);
-                using var fileStream = new FileStream(path, FileMode.Create);
-                model.Image.CopyTo(fileStream);
-                book.ImageUrl = model.Image.FileName;
+
+                //var path = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.Image.FileName);
+                //using var fileStream = new FileStream(path, FileMode.Create);
+                //await model.Image.CopyToAsync(fileStream);
+                //book.ImageUrl = model.Image.FileName;
+
+                using var stream=model.Image.OpenReadStream();
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(model.Image.FileName,stream),
+                    UseFilename = true
+                };
+                var uploadResult = await cloudinary.UploadAsync(uploadParams);
+                book.ImageUrl = uploadResult.SecureUrl.ToString();
+                book.ImagePuplicId = uploadResult.PublicId;
             }
             foreach (var item in model.SelectedCategories)
                 book.Categories.Add(new BookCategory { CategoryId = item });
@@ -83,7 +106,7 @@ namespace Bookify.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(BookFormViewModel model)
+        public async Task<IActionResult> Edit(BookFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -95,13 +118,17 @@ namespace Bookify.Web.Controllers
             if (book is null)
                 return NotFound();
 
+            string ImagePuplicId = null;
+
             if (model.Image != null)
             {
-                if (model.ImageUrl != null)
+                if (book.ImageUrl != null)
                 {
-                    var oldPath = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.ImageUrl);
-                    if (System.IO.File.Exists(oldPath))
-                        System.IO.File.Delete(oldPath);
+                    //var oldPath = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.ImageUrl);
+                    //if (System.IO.File.Exists(oldPath))
+                    //    System.IO.File.Delete(oldPath);
+
+                    await cloudinary.DeleteResourcesAsync(book.ImagePuplicId);
                 }
                 if (!allowedExtensionsImage.Contains(Path.GetExtension(model.Image.FileName)))
                 {
@@ -115,16 +142,29 @@ namespace Bookify.Web.Controllers
                     var viewModel = PopulateViewModel(model);
                     return View("Form", viewModel);
                 }
-                var path = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.Image.FileName);
-                using var fileStream = new FileStream(path, FileMode.Create);
-                model.Image.CopyTo(fileStream);
-                model.ImageUrl = model.Image.FileName;
+
+                //var path = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.Image.FileName);
+                //using var fileStream = new FileStream(path, FileMode.Create);
+                //await model.Image.CopyToAsync(fileStream);
+
+                using var stream = model.Image.OpenReadStream();
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(model.Image.FileName, stream),
+                    UseFilename = true
+                };
+                var uploadResult = await cloudinary.UploadAsync(uploadParams);
+                model.ImageUrl = uploadResult.SecureUrl.ToString();
+                ImagePuplicId = uploadResult.PublicId;
+
             }
-            else if (model.Image is null && model.ImageUrl != null)
+            else if (model.ImageUrl != null)
                 model.ImageUrl = book.ImageUrl;
 
             book = mapper.Map(model, book);
             book.LastUpdatedOn = DateTime.Now;
+            book.ImagePuplicId = ImagePuplicId;
+
             foreach (var item in model.SelectedCategories)
                 book.Categories.Add(new BookCategory { CategoryId = item });
 
