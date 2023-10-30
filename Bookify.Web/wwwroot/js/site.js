@@ -197,6 +197,4 @@ $(document).ready(function () {
             }
         });
     });
-
-
 })
