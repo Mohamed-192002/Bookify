@@ -35,6 +35,21 @@ namespace Bookify.Web.Controllers
         {
             return View();
         }
+        public IActionResult Details(int id)
+        {
+            var book = context.Books
+                .Include(b => b.Author)
+                .Include(b=>b.Categories)
+                .ThenInclude(c=>c.Category)
+                .SingleOrDefault(b => b.Id == id);
+            if (book is null)
+                return NotFound();
+
+            var viewModel = mapper.Map<BookViewModel>(book);
+
+            return View(viewModel);
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -104,7 +119,7 @@ namespace Bookify.Web.Controllers
             context.Books.Add(book);
             context.SaveChanges();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id = book.Id });
         }
 
         [HttpGet]
@@ -191,8 +206,12 @@ namespace Bookify.Web.Controllers
                 //ImagePuplicId = uploadResult.PublicId;
 
             }
-            else if (model.ImageUrl != null)
+
+            else if (model.ImageUrl is null)
+            {
                 model.ImageUrl = book.ImageUrl;
+                model.ImageThumbnailUrl= book.ImageThumbnailUrl;
+            }
 
             book = mapper.Map(model, book);
             book.LastUpdatedOn = DateTime.Now;
@@ -203,7 +222,7 @@ namespace Bookify.Web.Controllers
 
             context.SaveChanges();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id = book.Id });
         }
         public IActionResult AllowBook(BookFormViewModel viewModel)
         {
