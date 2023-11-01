@@ -42,7 +42,6 @@
                                 <span>${row.author}</span>
                             </div>`;
                 }
-
             },
             { "data": "publisher", "name": "Publisher" },
             {
