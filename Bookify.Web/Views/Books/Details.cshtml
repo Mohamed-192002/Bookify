@@ -12,8 +12,8 @@
             <div class="d-flex flex-wrap flex-sm-nowrap mb-6">
                 <!--begin::Image-->
                 <div class="d-flex flex-center flex-shrink-0 bg-light rounded w-100px h-100px w-lg-150px h-lg-150px me-7 mb-4">
-                    <a data-fslightbox href="@Model.ImageUrl">
-                        <img class="mw-50px mw-lg-75px" src="@Model.ImageThumbnailUrl" alt="@Model.Title" />
+                    <a data-fslightbox href="@(Model.ImageUrl is null? "/Images/Books/no-book.jpg":Model.ImageUrl)">
+                        <img class="mw-50px mw-lg-75px" src="@(Model.ImageThumbnailUrl is null? "/Images/Books/no-book.jpg":Model.ImageThumbnailUrl)" alt="@Model.Title" />
                     </a>
                 </div>
                 <!--end::Image-->
@@ -104,7 +104,7 @@
                                             <path fill-rule="evenodd" clip-rule="evenodd" d="M14.7857 7.125H6.21429C5.62255 7.125 5.14286 7.6007 5.14286 8.1875V18.8125C5.14286 19.3993 5.62255 19.875 6.21429 19.875H14.7857C15.3774 19.875 15.8571 19.3993 15.8571 18.8125V8.1875C15.8571 7.6007 15.3774 7.125 14.7857 7.125ZM6.21429 5C4.43908 5 3 6.42709 3 8.1875V18.8125C3 20.5729 4.43909 22 6.21429 22H14.7857C16.5609 22 18 20.5729 18 18.8125V8.1875C18 6.42709 16.5609 5 14.7857 5H6.21429Z" fill="currentColor" />
                                         </svg>
                                     </span>
-                                    <div class="fs-7 fw-bold" data-kt-countup="true" data-kt-countup-value="7">0</div>
+                                    <div class="fs-7 fw-bold" data-kt-countup="true" id="CopiesCount" data-kt-countup-value="@Model.BookCopies.Count()">0</div>
                                 </div>
                                 <!--end::Number-->
                                 <!--begin::Label-->
@@ -142,7 +142,9 @@
                 <li class="nav-item">
                     <a class="nav-link text-active-primary py-5 me-6" data-bs-toggle="tab" href="#Copies">Copies</a>
                 </li>
+                <!--end::Nav item-->
             </ul>
+
             <!--end::Nav-->
         </div>
     </div>
@@ -169,10 +171,49 @@
                 <!--begin::Card title-->
                 <div class="card-title fs-3 fw-bold">Copies</div>
                 <!--end::Card title-->
+                <!--begin::Actions-->
+                <div class="mt-4">
+                    <a href="javascript:;" class="btn btn-sm btn-primary js-render-modal" data-title="Add Copy" data-url="/Copies/Create?bookId=@Model.Id">
+                        <i class="bi bi-plus"></i>
+                        Add Copy
+                    </a>
+                </div>
+                <!--end::Actions-->
             </div>
             <!--end::Card header-->
             <div class="card-body">
-                Copies
+                <table class="@(Model.BookCopies.Any()?string.Empty:"d-none") table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Serial Number</th>
+                            <th scope="col">Edition</th>
+                            <th scope="col">Rental</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created On</th>
+                            <th scope="col">Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.BookCopies.OrderByDescending(c => c.Id))
+                        {
+                            <partial name="_BookCopyRaw" model="@item" />
+                        }
+                    </tbody>
+                </table>
+                <div id="alert" class="@(Model.BookCopies.Any()?"d-none":string.Empty) alert alert-dismissible bg-light-danger d-flex flex-column flex-sm-row w-100 p-5 mb-10">
+                    <!--begin::Icon-->
+                    <i class="bi bi-exclamation-square fs-2hx text-danger me-8 mt-2 mb-sm-0"></i>
+                    <!--end::Icon-->
+                    <!--begin::Content-->
+                    <div class="d-flex flex-column pe-0 pe-sm-10">
+                        <h4 class="fw-semibold">This is an alert</h4>
+                        <span>Not exist any copies for this book !</span>
+                    </div>
+                    <!--end::Content-->
+                </div>
+
+
             </div>
         </div>
         <!--end::Card-->
@@ -181,4 +222,34 @@
 
 @section Plugins{
     <script src="~/assets/plugins/fslightbox/fslightbox.bundle.js"></script>
+}
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        function OnAddCopyModelSuccess(item) {
+            ShowMessageSuccessfully();
+
+            $('#Modal').modal('hide');
+
+            $('tbody').prepend(item);
+            var NewCount = parseInt($('#CopiesCount').text()) + 1;
+            $('#CopiesCount').text(NewCount);
+            KTMenu.createInstances();
+
+            $('#alert').addClass('d-none');
+            $('table').removeClass('d-none');
+
+        }
+        function OnEditCopyModelSuccess(item) {
+            ShowMessageSuccessfully();
+            $('#Modal').modal('hide');
+            $(UpdatedRow).replaceWith(item);
+            KTMenu.createInstances();
+
+        }
+
+    </script>
 }

@@ -16,21 +16,21 @@ namespace Bookify.Web.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly Cloudinary cloudinary;
+        //private readonly Cloudinary cloudinary;
         private List<string> allowedExtensionsImage = new() { ".jpg", ".png", ".jpeg" };
         private int maxSizeForImage = 2097152;
-        public BooksController(ApplicationDbContext _context, IMapper _mapper, IWebHostEnvironment _webHostEnvironment, IOptions<CloudinarySettings> _cloudinary)
+        public BooksController(ApplicationDbContext _context, IMapper _mapper, IWebHostEnvironment _webHostEnvironment/*, IOptions<CloudinarySettings> _cloudinary*/)
         {
             context = _context;
             mapper = _mapper;
             webHostEnvironment = _webHostEnvironment;
-            Account account = new()
-            {
-                ApiKey = _cloudinary.Value.ApiKey,
-                ApiSecret = _cloudinary.Value.ApiSecret,
-                Cloud = _cloudinary.Value.Cloud,
-            };
-            cloudinary = new Cloudinary(account);
+            //Account account = new()
+            //{
+            //    ApiKey = _cloudinary.Value.ApiKey,
+            //    ApiSecret = _cloudinary.Value.ApiSecret,
+            //    Cloud = _cloudinary.Value.Cloud,
+            //};
+            //cloudinary = new Cloudinary(account);
         }
         public IActionResult Index()
         {
@@ -79,6 +79,7 @@ namespace Bookify.Web.Controllers
                 .Include(b => b.Author)
                 .Include(b => b.Categories)
                 .ThenInclude(c => c.Category)
+                .Include(b => b.BookCopies)
                 .SingleOrDefault(b => b.Id == id);
             if (book is null)
                 return NotFound();

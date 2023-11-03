@@ -26,6 +26,7 @@ function ShowMessageError(message = 'Something went wrong!') {
 function OnModelComplete() {
     $('body:submit').removeAttr('disabled');
 }
+ 
 function OnModelSuccess(item) {
     ShowMessageSuccessfully();
     $('#Modal').modal('hide');
@@ -183,7 +184,7 @@ $(document).ready(function () {
                         url: btn.data('url'),
                         success: function (LastUpdatedOn) {
                             var status = btn.parents('tr').find('.js-status');
-                            var newText = status.text() === "Deleted" ? "Available" : "Deleted";
+                            var newText = status.text() == "Deleted" ? "Available" : "Deleted";
                             status.text(newText);
                             status.toggleClass("badge-light-success badge-light-danger");
                             btn.parents('tr').find('.js-update').text(LastUpdatedOn);
