@@ -20,13 +20,13 @@ function ShowMessageError(message = 'Something went wrong!') {
     Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: message
+        text: message.responseText != undefined ? message.responseText : message
     });
 }
 function OnModelComplete() {
     $('body:submit').removeAttr('disabled');
 }
- 
+
 function OnModelSuccess(item) {
     ShowMessageSuccessfully();
     $('#Modal').modal('hide');
@@ -155,6 +155,11 @@ $(document).ready(function () {
             success: function (form) {
                 modal.find('.modal-body').html(form);
                 $.validator.unobtrusive.parse(modal);
+
+                $('.js-data-ajax').select2();
+                $('.js-data-ajax').on('select2:select', function (e) {
+                    $(form).validate().element('#' + $(this).attr('id'));
+                });
             },
             error: function () {
                 ShowMessageError()

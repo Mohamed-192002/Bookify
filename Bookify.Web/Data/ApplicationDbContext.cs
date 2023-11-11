@@ -1,6 +1,6 @@
 ﻿namespace Bookify.Web.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUsers>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Author> Authors { get; set; }

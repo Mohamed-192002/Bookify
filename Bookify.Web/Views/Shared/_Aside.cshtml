@@ -62,6 +62,19 @@
                         <span class="menu-title">Books</span>
                     </a>
                     <!--end:Menu link-->
+                    @if (User.IsInRole(AppRoles.Admin))
+                    {
+                        <!--begin:Menu link-->
+                        <a class="menu-link " active-when="Users" asp-controller="Users" asp-action="Index">
+                            <span class="menu-icon">
+                                <!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/abstract/abs027.svg-->
+                                <i class="bi bi-people fs-1"></i>
+                                <!--end::Svg Icon-->
+                            </span>
+                            <span class="menu-title">Users</span>
+                        </a>
+                        <!--end:Menu link-->
+                    }
                 </div>
                 <!--end:Menu item-->
 

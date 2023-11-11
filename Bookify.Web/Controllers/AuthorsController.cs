@@ -1,5 +1,9 @@
-﻿namespace Bookify.Web.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
+namespace Bookify.Web.Controllers
 {
+   [Authorize(Roles =AppRoles.Archive)]
     public class AuthorsController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -31,7 +35,7 @@
                 return BadRequest();
 
             var model = mapper.Map<Author>(viewModel);
-
+            model.CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.Authors.Add(model);
             context.SaveChanges();
 
@@ -56,6 +60,7 @@
                 return BadRequest();
             var author = context.Authors.Find(viewModel.Id);
             author = mapper.Map(viewModel, author);
+            author.LastUpdatedId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             author.LastUpdatedOn = DateTime.Now;
             context.SaveChanges();
 
@@ -71,13 +76,15 @@
                 return NotFound();
             author.IsDeleted = !author.IsDeleted;
             author.LastUpdatedOn = DateTime.Now;
+            author.LastUpdatedId= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.SaveChanges();
             return Ok(author.LastUpdatedOn.ToString());
         }
         public IActionResult AllowAuthor(AuthorFormViewModel viewModel)
         {
-            var isExist = context.Authors.Any(c => c.Name == viewModel.Name);
-            return Json(!isExist);
+            var author = context.Authors.FirstOrDefault(c => c.Name == viewModel.Name);
+            var isAllow = author is null || author.Id.Equals(viewModel.Id);
+            return Json(isAllow);
         }
     }
 }

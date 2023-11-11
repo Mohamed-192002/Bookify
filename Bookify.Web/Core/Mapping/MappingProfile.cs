@@ -33,10 +33,15 @@ namespace Bookify.Web.Core.Mapping
             // Book Copies
             CreateMap<BookCopy, BookCopyViewModel>()
              .ForMember(dest => dest.BookTitle, opt => opt.MapFrom(sourceMember => sourceMember.Book!.Title));
-
             CreateMap<BookCopy,BookCopyFormViewModel>().ReverseMap();
 
+            // User
+            CreateMap<ApplicationUsers, UsersViewModel>();
+            CreateMap<UsersFormViewModel,ApplicationUsers>()
+                .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(sourceMember => sourceMember.Email.ToUpper()))
+                .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(sourceMember => sourceMember.UserName.ToUpper()))
 
+                .ReverseMap();
         }
     }
 }

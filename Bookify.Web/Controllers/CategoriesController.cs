@@ -1,5 +1,9 @@
-﻿namespace Bookify.Web.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
+namespace Bookify.Web.Controllers
 {
+    [Authorize(Roles =AppRoles.Archive)]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -31,7 +35,7 @@
                 return BadRequest();
 
             var model = mapper.Map<Category>(viewModel);
-
+            model.CreatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.Categories.Add(model);
             context.SaveChanges();
 
@@ -57,6 +61,7 @@
             var category = context.Categories.Find(viewModel.Id);
             category = mapper.Map(viewModel, category);
             category.LastUpdatedOn = DateTime.Now;
+            category.LastUpdatedId= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.SaveChanges();
 
             var categoryViewModel = mapper.Map<CategoryViewModel>(category);
@@ -71,13 +76,15 @@
                 return NotFound();
             category.IsDeleted = !category.IsDeleted;
             category.LastUpdatedOn = DateTime.Now;
+            category.LastUpdatedId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.SaveChanges();
             return Ok(category.LastUpdatedOn.ToString());
         }
         public IActionResult AllowCategory(CategoryFormViewModel viewModel)
         {
-            var isExist = context.Categories.Any(c => c.Name == viewModel.Name);
-            return Json(!isExist);
+            var category = context.Categories.FirstOrDefault(c=>c.Name==viewModel.Name);
+            var isAllow=category is null||category.Id.Equals(viewModel.Id);
+            return Json(isAllow);
         }
     }
 }

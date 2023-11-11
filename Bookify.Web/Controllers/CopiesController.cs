@@ -1,11 +1,14 @@
 ﻿using Bookify.Web.Core.Models;
 using Bookify.Web.Settings;
 using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace Bookify.Web.Controllers
 {
+    [Authorize(Roles = AppRoles.Archive)]
     public class CopiesController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -47,7 +50,8 @@ namespace Bookify.Web.Controllers
             var copy = new BookCopy
             {
                 EditionNumber = model.EditionNumber,
-                IsAvilableForRental = book.IsAvilableForRental && model.IsAvilableForRental
+                IsAvilableForRental = book.IsAvilableForRental && model.IsAvilableForRental,
+                CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value
             };
             book.BookCopies.Add(copy);
             context.SaveChanges();
@@ -81,6 +85,7 @@ namespace Bookify.Web.Controllers
 
             copy.EditionNumber = model.EditionNumber;
             copy.IsAvilableForRental = copy.Book!.IsAvilableForRental && model.IsAvilableForRental;
+            copy.LastUpdatedId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.SaveChanges();
 
             var copyViewModel = mapper.Map<BookCopyViewModel>(copy);
@@ -96,6 +101,7 @@ namespace Bookify.Web.Controllers
                 return NotFound();
             copy.IsDeleted = !copy.IsDeleted;
             copy.LastUpdatedOn = DateTime.Now;
+            copy.LastUpdatedId= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.SaveChanges();
             return Ok();
         }

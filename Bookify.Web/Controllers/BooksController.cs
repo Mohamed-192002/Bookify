@@ -2,15 +2,18 @@
 using Bookify.Web.Settings;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.Linq.Dynamic.Core;
+using System.Security.Claims;
 
 namespace Bookify.Web.Controllers
 {
+    [Authorize(Roles =AppRoles.Archive)]
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -122,7 +125,7 @@ namespace Bookify.Web.Controllers
                     return View("Form", viewModel);
                 }
 
-
+                book.CreatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
                 var path = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.Image.FileName);
                 var Thumbpath = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books/thumb", model.Image.FileName);
 
@@ -183,7 +186,7 @@ namespace Bookify.Web.Controllers
                 return View("Form", viewModel);
             }
 
-            var book = context.Books.Include(c => c.Categories).SingleOrDefault(b => b.Id == model.Id);
+            var book = context.Books.Include(c => c.Categories).Include(c=>c.BookCopies).SingleOrDefault(b => b.Id == model.Id);
             if (book is null)
                 return NotFound();
 
@@ -216,7 +219,6 @@ namespace Bookify.Web.Controllers
                     var viewModel = PopulateViewModel(model);
                     return View("Form", viewModel);
                 }
-
                 var path = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books", model.Image.FileName);
                 var Thumbpath = Path.Combine($"{webHostEnvironment.WebRootPath}/Images/Books/thumb", model.Image.FileName);
 
@@ -254,10 +256,19 @@ namespace Bookify.Web.Controllers
 
             book = mapper.Map(model, book);
             book.LastUpdatedOn = DateTime.Now;
+            book.LastUpdatedId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
             //  book.ImagePuplicId = ImagePuplicId;
 
             foreach (var item in model.SelectedCategories)
                 book.Categories.Add(new BookCategory { CategoryId = item });
+            if(!model.IsAvilableForRental)
+            {
+                foreach (var item in book.BookCopies)
+                {
+                    item.IsAvilableForRental = false;
+                }
+            }
 
             context.SaveChanges();
 
@@ -265,19 +276,10 @@ namespace Bookify.Web.Controllers
         }
         public IActionResult AllowBook(BookFormViewModel viewModel)
         {
-            var isAllow = true;
-            var isExist = context.Books.Any(b => b.Title == viewModel.Title && b.AuthorId == viewModel.AuthorId);
-            if (viewModel.Id == 0)
-                isAllow = isExist;
-            else if (viewModel.Id > 0)
-            {
-                var book = context.Books.Find(viewModel.Id);
-                if (book.Title == viewModel.Title)
-                    isAllow = false;
-                else
-                    isAllow = isExist;
-            }
-            return Json(!isAllow);
+            var book=context.Books.FirstOrDefault(b => b.Title == viewModel.Title && b.AuthorId == viewModel.AuthorId);
+            var isAllow = book is null || book.Id.Equals(viewModel.Id);
+            return Json(isAllow);
+   
         }
         [HttpPost]
         public IActionResult ToggleStatus(int id)
@@ -287,6 +289,7 @@ namespace Bookify.Web.Controllers
                 return NotFound();
             book.IsDeleted = !book.IsDeleted;
             book.LastUpdatedOn = DateTime.Now;
+            book.LastUpdatedId= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             context.SaveChanges();
             return Ok(book.LastUpdatedOn.ToString());
         }
