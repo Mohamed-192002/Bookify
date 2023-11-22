@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Bookify.Web.Services;
 
 namespace Bookify.Web.Areas.Identity.Pages.Account
 {
@@ -21,11 +22,14 @@ namespace Bookify.Web.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IEmailBodyBuilder _emailBodyBuilder;
 
-        public ForgotPasswordModel(UserManager<ApplicationUsers> userManager, IEmailSender emailSender)
+
+        public ForgotPasswordModel(UserManager<ApplicationUsers> userManager, IEmailSender emailSender, IEmailBodyBuilder emailBodyBuilder)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _emailBodyBuilder = emailBodyBuilder;
         }
 
         /// <summary>
@@ -71,10 +75,17 @@ namespace Bookify.Web.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                #region Send massage Email
+                var body = _emailBodyBuilder.GetEmailBody
+                    (
+                    "https://res.cloudinary.com/mhmdnosair/image/upload/v1700498236/icon-positive-vote-2_sgatwf.png"
+                    , $"Hey {user.FullName}"
+                    , "Please reset your password"
+                    , $"{HtmlEncoder.Default.Encode(callbackUrl!)}"
+                    , "Reset Password"
+                    );
+                await _emailSender.SendEmailAsync(Input.Email, "Reset Password", body);
+                #endregion
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

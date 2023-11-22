@@ -4,6 +4,9 @@ using UoN.ExpressiveAnnotations.NetCore.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Bookify.Web.Data;
+using Bookify.Web.Helpers;
+using Bookify.Web.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Bookify.Web
 {
@@ -18,11 +21,19 @@ namespace Bookify.Web
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUsers>, ApplicationUserClaimsPrincipleFactory>();
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+            builder.Services.AddTransient<IImageServices, ImageServices>();
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+			builder.Services.AddTransient<IEmailBodyBuilder, EmailBodyBuilder>();
+
+			builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
             // Map Cloudinary Settings
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
-            builder.Services.AddIdentity<ApplicationUsers,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddIdentity<ApplicationUsers, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
@@ -46,7 +57,7 @@ namespace Bookify.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
             app.UseRouting();
 
             app.UseAuthentication();

@@ -4,12 +4,15 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Bookify.Web.Core.Models;
+using Bookify.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SixLabors.ImageSharp;
 
 namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -17,13 +20,17 @@ namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly SignInManager<ApplicationUsers> _signInManager;
+        private readonly IImageServices imageServices;
+
 
         public IndexModel(
             UserManager<ApplicationUsers> userManager,
-            SignInManager<ApplicationUsers> signInManager)
+            SignInManager<ApplicationUsers> signInManager,
+            IImageServices _imageServices)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            imageServices = _imageServices;
         }
 
         /// <summary>
@@ -56,9 +63,17 @@ namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            [Required, MaxLength(100, ErrorMessage = Errors.MaxLength), Display(Name = "Full Name")]
+            public string FullName { get; set; } = null!;
+
             [Phone]
+            [Required]
             [Display(Name = "Phone number")]
+            [RegularExpression(RegexPatterns.phoneRegex, ErrorMessage = "Invalid Phone number")]
             public string PhoneNumber { get; set; }
+
+            public IFormFile? Avatar { get; set; }
+            public bool AvatarDeleted { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUsers user)
@@ -70,7 +85,8 @@ namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
             };
         }
 
@@ -100,6 +116,24 @@ namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+
+            if (Input.Avatar != null)
+            {
+                imageServices.Delete($"/Images/Users/{user.Id}.png");
+                var result = await imageServices.UploadAsync(Input.Avatar, $"{user.Id}.png", "/Images/Users", false);
+
+                if (!result.IsUploaded)
+                {
+                    ModelState.AddModelError("Input.Avatar", result.errorMessage!);
+                    await LoadAsync(user);
+                    return Page();
+                }
+            }
+            else if (Input.AvatarDeleted)
+            {
+                imageServices.Delete($"/Images/Users/{user.Id}.png");
+            }
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -107,6 +141,16 @@ namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
+                    return RedirectToPage();
+                }
+            }
+            if (Input.FullName != user.FullName)
+            {
+                user.FullName = Input.FullName;
+                var setFullNameResult = await _userManager.UpdateAsync(user);
+                if (!setFullNameResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set Full Name.";
                     return RedirectToPage();
                 }
             }

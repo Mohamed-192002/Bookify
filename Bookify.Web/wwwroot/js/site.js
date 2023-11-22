@@ -203,4 +203,44 @@ $(document).ready(function () {
             }
         });
     });
-})
+
+    // Handel Unlock
+    $('body').delegate('.js-confirm', "click", function () {
+        var btn = $(this);
+        bootbox.confirm({
+            message: btn.data('message'),
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-secondary '
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.post({
+                        url: btn.data('url'),
+                        success: function () {
+                            ShowMessageSuccessfully();
+                        },
+                        error: function () {
+                            ShowMessageError();
+                        },
+                    });
+                }
+            }
+        });
+    });
+
+
+
+
+
+
+
+
+
+});
