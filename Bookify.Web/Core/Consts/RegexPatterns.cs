@@ -3,6 +3,6 @@
     public static class RegexPatterns
     {
         public const string Passward = "(?=(.*[0-9]))(?=.*[\\!@#$%^&*()\\\\[\\]{}\\-_+=~`|:;\"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}";
-        public const string phoneRegex = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$";
+        public const string phoneRegex = "^(\\+201|01|00201)[0-2,5]{1}[0-9]{8}";
     }
 }

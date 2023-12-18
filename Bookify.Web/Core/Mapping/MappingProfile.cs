@@ -33,15 +33,33 @@ namespace Bookify.Web.Core.Mapping
             // Book Copies
             CreateMap<BookCopy, BookCopyViewModel>()
              .ForMember(dest => dest.BookTitle, opt => opt.MapFrom(sourceMember => sourceMember.Book!.Title));
-            CreateMap<BookCopy,BookCopyFormViewModel>().ReverseMap();
+            CreateMap<BookCopy, BookCopyFormViewModel>().ReverseMap();
 
             // User
             CreateMap<ApplicationUsers, UsersViewModel>();
-            CreateMap<UsersFormViewModel,ApplicationUsers>()
+            CreateMap<UsersFormViewModel, ApplicationUsers>()
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(sourceMember => sourceMember.Email.ToUpper()))
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(sourceMember => sourceMember.UserName.ToUpper()))
-
                 .ReverseMap();
+
+            // Subscriper
+            CreateMap<SubscriperFormViewModel, Subscriper>()
+               .ReverseMap();
+            CreateMap<SubscriperFormViewModel, Subscriper>();
+            CreateMap<Subscriper, SubscriperViewModel>()
+                .ForMember(dest => dest.Area, opt => opt.MapFrom(sourceMember => sourceMember.Area!.Name))
+                .ForMember(dest => dest.Governorate, opt => opt.MapFrom(sourceMember => sourceMember.Governorate!.Name));
+
+
+            // Area
+            CreateMap<Area, SelectListItem>()
+               .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
+               .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
+            // governorate
+            CreateMap<Governorate, SelectListItem>()
+             .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
+             .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
+
         }
     }
 }

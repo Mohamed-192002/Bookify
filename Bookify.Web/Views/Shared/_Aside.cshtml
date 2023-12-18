@@ -78,6 +78,19 @@
                         </a>
                         <!--end:Menu link-->
                     }
+                    @if (User.IsInRole(AppRoles.Reception))
+                    {
+                        <!--begin:Menu link-->
+                        <a class="menu-link " active-when="Subscripers" asp-controller="Subscripers" asp-action="Index">
+                            <span class="menu-icon">
+                                <!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/abstract/abs027.svg-->
+                                <i class="bi bi-people fs-1"></i>
+                                <!--end::Svg Icon-->
+                            </span>
+                            <span class="menu-title">Subscripers</span>
+                        </a>
+                        <!--end:Menu link-->
+                    }
                 </div>
                 <!--end:Menu item-->
 
@@ -89,10 +102,3 @@
 
 </div>
 <!--end::Aside-->
-@section Scripts{
-    <script>
-        $(document).ready(function () {
-
-        });
-    </script>
-}

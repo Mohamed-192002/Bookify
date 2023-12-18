@@ -7,6 +7,10 @@
         public DbSet<Book> Books { get; set; }
         public DbSet<BookCategory> BookCategories { get; set; }
         public DbSet<BookCopy> BookCopies { get; set; }
+        public DbSet<Subscriper> Subscripers { get; set; }
+        public DbSet<Governorate> Governorates { get; set; }
+        public DbSet<Area> Areas { get; set; }
+
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -22,6 +26,10 @@
             builder.Entity<BookCopy>()
                 .Property(c => c.SerialNumber)
                 .HasDefaultValueSql("NEXT VALUE FOR shared.SerialNumber");
+
+            var cascadeFKs = builder.Model.GetEntityTypes().SelectMany(f => f.GetForeignKeys()).Where(fk => fk.DeleteBehavior == DeleteBehavior.Cascade && !fk.IsOwnership);
+            foreach (var item in cascadeFKs)
+                item.DeleteBehavior = DeleteBehavior.Restrict;
 
             base.OnModelCreating(builder);
         }
