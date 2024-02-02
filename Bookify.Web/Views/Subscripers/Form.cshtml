@@ -5,14 +5,14 @@
 }
 
 <div class="d-flex justify-content-center mb-5">
-    <h5 class="mb-1">@(Model.Id > 0 ? "Edit" : "Create") Subscriper</h5>
+    <h5 class="mb-1">@(string.IsNullOrEmpty(Model.Key) ? "Create" : "Edit") Subscriper</h5>
 </div>
 <div class="card shadow-sm">
     <div class="card-body">
         <form asp-controller="Subscripers" method="post" enctype="multipart/form-data">
-            @if (Model.Id > 0)
+            @if (!string.IsNullOrEmpty(Model.Key))
             {
-                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Key" />
             }
             
             <!--begin::Input group-->
@@ -146,7 +146,7 @@
             </div>
             <div class="mt-5">
                 <button type="submit" class="btn btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary">
-                    @if (Model.Id == 0)
+                    @if (string.IsNullOrEmpty(Model.Key))
                     {
                         <i class="bi bi-patch-plus-fill"></i>
                     }

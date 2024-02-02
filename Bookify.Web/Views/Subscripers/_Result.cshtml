@@ -1,4 +1,4 @@
-﻿@model SubscriperFormViewModel
+﻿@model SubscriperSearchResultViewModel
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -24,9 +24,9 @@
         {
             <div class="d-flex justify-content-between">
                 <div class="d-flex flex-column">
-                    <h4>@Model.FirstName @Model.LastName</h4>
+                    <h4>@Model.FullName</h4>
                     <div>
-                        <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@Model.Id">
+                        <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@Model.Key">
                             <i class="bi bi-plus"></i>
                             Details
                         </a>
@@ -36,7 +36,7 @@
                     <!--begin::Image-->
                     <div class="symbol symbol-100px">
                         <a href="@Model.ImageUrl">
-                            <img class="mw-50px mw-lg-75px" src="@Model.ImageUrl" alt="@Model.FirstName" />
+                            <img class="mw-50px mw-lg-75px" src="@Model.ImageUrl" alt="@Model.FullName" />
                         </a>
                     </div>
                     <!--end::Image-->

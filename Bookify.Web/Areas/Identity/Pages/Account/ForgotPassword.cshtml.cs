@@ -74,16 +74,16 @@ namespace Bookify.Web.Areas.Identity.Pages.Account
                     pageHandler: null,
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
-
+                var Placeholders = new Dictionary<string, string>()
+                {
+                    {"imageUrl","https://res.cloudinary.com/mhmdnosair/image/upload/v1700498236/icon-positive-vote-2_sgatwf.png"},
+                    {"header",$"Hey {user.FullName}" },
+                    {"body","Please reset your password" },
+                    {"url",$"{HtmlEncoder.Default.Encode(callbackUrl!)}" },
+                    {"linkTitle","Reset Password" },
+                };
                 #region Send massage Email
-                var body = _emailBodyBuilder.GetEmailBody
-                    (
-                    "https://res.cloudinary.com/mhmdnosair/image/upload/v1700498236/icon-positive-vote-2_sgatwf.png"
-                    , $"Hey {user.FullName}"
-                    , "Please reset your password"
-                    , $"{HtmlEncoder.Default.Encode(callbackUrl!)}"
-                    , "Reset Password"
-                    );
+                var body = _emailBodyBuilder.GetEmailBody("email", Placeholders);
                 await _emailSender.SendEmailAsync(Input.Email, "Reset Password", body);
                 #endregion
 

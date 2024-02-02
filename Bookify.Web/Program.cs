@@ -7,6 +7,9 @@ using Bookify.Web.Data;
 using Bookify.Web.Helpers;
 using Bookify.Web.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.DataProtection;
+using WhatsAppCloudApi.Extensions;
 
 namespace Bookify.Web
 {
@@ -26,9 +29,9 @@ namespace Bookify.Web
 
             builder.Services.AddTransient<IImageServices, ImageServices>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
-			builder.Services.AddTransient<IEmailBodyBuilder, EmailBodyBuilder>();
+            builder.Services.AddTransient<IEmailBodyBuilder, EmailBodyBuilder>();
 
-			builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
+            builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
             // Map Cloudinary Settings
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
@@ -38,9 +41,14 @@ namespace Bookify.Web
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
             builder.Services.AddControllersWithViews();
+            // Resolve Whatsapp
+            builder.Services.AddWhatsAppApiClient(builder.Configuration);
             // Resolve AutoMapper
             builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
             builder.Services.AddExpressiveAnnotations();
+
+            builder.Services.AddDataProtection().SetApplicationName(nameof(Bookify));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

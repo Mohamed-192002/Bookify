@@ -129,15 +129,17 @@ namespace Bookify.Web.Areas.Identity.Pages.Account.Manage
                     pageHandler: null,
                     values: new { area = "Identity", userId = userId, email = Input.NewEmail, code = code },
                     protocol: Request.Scheme);
+                var Placeholders = new Dictionary<string, string>()
+                {
+                    {"imageUrl","https://res.cloudinary.com/mhmdnosair/image/upload/v1700498236/icon-positive-vote-2_sgatwf.png"},
+                    {"header",$"Hey {user.FullName}" },
+                    {"body","Please check to Change Email" },
+                    {"url",$"{HtmlEncoder.Default.Encode(callbackUrl!)}" },
+                    {"linkTitle","Change Email" },
+                };
+
                 #region Send massage Email
-                var body = _emailBodyBuilder.GetEmailBody
-                    (
-                    "https://res.cloudinary.com/mhmdnosair/image/upload/v1700498236/icon-positive-vote-2_sgatwf.png"
-                    , $"Hey {user.FullName}"
-                    , "Please check to Change Email"
-                    , $"{HtmlEncoder.Default.Encode(callbackUrl!)}"
-                    , "Change Email"
-                    );
+                var body = _emailBodyBuilder.GetEmailBody("email",Placeholders);
                 await _emailSender.SendEmailAsync(Input.NewEmail, "Change Email", body);
                 #endregion
 

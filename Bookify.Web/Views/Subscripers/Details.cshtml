@@ -20,7 +20,7 @@
         <!--begin::Actions-->
         <div class="d-flex align-items-center py-2 py-md-1">
             <!--begin::Button-->
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-dark fw-bold" id="kt_toolbar_primary_button">
+            <a asp-action="Edit" asp-route-id="@Model.Key" class="btn btn-dark fw-bold" id="kt_toolbar_primary_button">
                 Edit
             </a>
             <!--end::Button-->
@@ -78,7 +78,7 @@
                         <div class="pb-5 fs-6">
                             <!--begin::Details item-->
                             <div class="fw-bold mt-5">Customer ID</div>
-                            <div class="text-gray-600">ID-@Model.Id</div>
+                            <div class="text-gray-600">ID- @Model.Id</div>
                             <!--begin::Details item-->
                             <!--begin::Details item-->
                             <div class="fw-bold mt-5">National ID</div>
