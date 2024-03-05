@@ -10,9 +10,13 @@ using Microsoft.AspNetCore.Hosting;
 using System.Net.Mail;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 
 namespace subscriperify.Web.Controllers
 {
+    [Authorize(Roles = AppRoles.Reception)]
     public class SubscripersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -79,6 +83,14 @@ namespace subscriperify.Web.Controllers
 
             subscriper.CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
+            subscriper.Subscriptions.Add(new Subscription()
+            {
+                CreatedById = subscriper.CreatedById,
+                CreatedOn = subscriper.CreatedOn,
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddYears(1)
+            });
+
             _context.Subscripers.Add(subscriper);
             _context.SaveChanges();
             // Send welcome email to user
@@ -90,18 +102,18 @@ namespace subscriperify.Web.Controllers
                      };
             #region Send massage Email
             var body = _emailBodyBuilder.GetEmailBody("notification", Placeholders);
-            await _emailSender.SendEmailAsync(model.Email, "Welcome to Bookify", body);
+            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(model.Email, "Welcome to Bookify", body));
             #endregion
 
             // send welcome message using whatsapp
             if (model.HasWhatsApp)
             {
                 var mobileNumber = _webHostEnvironment.IsDevelopment() ? "01068103118" : model.MobileNumber;
-                await _whatsAppClient
-                    .SendMessage(mobile: $"2{mobileNumber}", language: WhatsAppLanguageCode.English_US, template: "welcome_massage ");
+                BackgroundJob.Enqueue(() => _whatsAppClient
+                .SendMessage($"2{mobileNumber}", WhatsAppLanguageCode.English_US, "welcome_massage ", null));
             }
-            return RedirectToAction(nameof(Index), new { id = _dataProtector.Protect(subscriper.Id.ToString()) });
 
+            return RedirectToAction(nameof(Index), new { id = _dataProtector.Protect(subscriper.Id.ToString()) });
         }
         public IActionResult Details(string id)
         {
@@ -109,6 +121,7 @@ namespace subscriperify.Web.Controllers
             var subscriper = _context.Subscripers
                 .Include(b => b.Governorate)
                 .Include(b => b.Area)
+                .Include(b => b.Subscriptions)
                 .SingleOrDefault(b => b.Id == subscriperId);
             if (subscriper is null)
                 return NotFound();
@@ -205,6 +218,46 @@ namespace subscriperify.Web.Controllers
             return PartialView("_Result", model);
 
         }
+
+        [HttpPost]
+        public IActionResult RenewSubscription(string sKey)
+        {
+            var id = int.Parse(_dataProtector.Unprotect(sKey));
+            var subscriper = _context.Subscripers.Include(s => s.Subscriptions).SingleOrDefault(s => s.Id == id);
+            if (subscriper == null)
+                return NotFound();
+            if (subscriper.IsBlackListed)
+                return BadRequest();
+            var lastsubscription = subscriper.Subscriptions.Last();
+
+            var startDate = lastsubscription.EndDate < DateTime.Today ? DateTime.Today : lastsubscription.EndDate.AddDays(1);
+
+            var Newsubscription = new Subscription()
+            {
+                CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value,
+                CreatedOn = DateTime.Now,
+                StartDate = startDate,
+                EndDate = startDate.AddYears(1)
+
+            };
+            subscriper.Subscriptions.Add(Newsubscription);
+            _context.SaveChanges();
+
+            // send email 
+            var Placeholders = new Dictionary<string, string>()
+                     {
+                         {"imageUrl","https://res.cloudinary.com/mhmdnosair/image/upload/v1700498236/icon-positive-vote-2_sgatwf.png"},
+                         {"header",$"Hey {subscriper.FirstName}" },
+                         {"body",$"Your subscription has been renewed through {Newsubscription.EndDate:d MMM-yyyy}" },
+                     };
+            #region Send massage Email
+            var body = _emailBodyBuilder.GetEmailBody("notification", Placeholders);
+            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(subscriper.Email, "Bookify Subscription Renewal", body));
+            #endregion
+
+            var viewModel = _mapper.Map<SubscriptionViewModel>(Newsubscription);
+            return PartialView("_SubscriptionRow", viewModel);
+        }
         private SubscriperFormViewModel PopulateViewModel(SubscriperFormViewModel? model = null)
         {
             SubscriperFormViewModel viewModel = model is null ? new SubscriperFormViewModel() : model;
@@ -260,5 +313,11 @@ namespace subscriperify.Web.Controllers
             var isAllow = subscriperEmail is null || subscriperEmail.Id.Equals(id);
             return Json(isAllow);
         }
+        //public async Task<IActionResult> PrepareExpirationAlert()
+        //{
+        //    var subscriper = _context.Subscripers.Include(s => s.Subscriptions)
+        //        .Where(s => s.Subscriptions.OrderByDescending(x => x.EndDate).First().EndDate == DateTime.Now.AddDays(5)).ToList();
+
+        //}
     }
 }

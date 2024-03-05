@@ -1,4 +1,6 @@
-﻿namespace Bookify.Web.Data
+﻿using Bookify.Web.Core.Models;
+
+namespace Bookify.Web.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUsers>
     {
@@ -9,7 +11,10 @@
         public DbSet<BookCopy> BookCopies { get; set; }
         public DbSet<Subscriper> Subscripers { get; set; }
         public DbSet<Governorate> Governorates { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Area> Areas { get; set; }
+        public DbSet<Rental> Rentals { get; set; }
+        public DbSet<RentalCopy> RentalCopies { get; set; }
 
 
 
@@ -21,6 +26,7 @@
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<BookCategory>().HasKey(x => new { x.CategoryId, x.BookId });
+            builder.Entity<RentalCopy>().HasKey(x => new { x.RentalId, x.BookCopyId });
 
             builder.HasSequence<int>(name: "SerialNumber", schema: "shared").StartsAt(1000001);
             builder.Entity<BookCopy>()

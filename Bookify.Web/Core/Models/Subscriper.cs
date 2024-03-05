@@ -18,7 +18,7 @@
         public string MobileNumber { get; set; } = null!;
         public bool HasWhatsApp { get; set; }
         [MaxLength(150)]
-        public string Email { get; set; }= null!;
+        public string Email { get; set; } = null!;
         [MaxLength(500)]
         public string ImageUrl { get; set; } = null!;
         [MaxLength(500)]
@@ -30,5 +30,8 @@
         [MaxLength(500)]
         public string Address { get; set; } = null!;
         public bool IsBlackListed { get; set; }
+        public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+        public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+
     }
 }

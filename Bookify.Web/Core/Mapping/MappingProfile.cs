@@ -41,6 +41,15 @@ namespace Bookify.Web.Core.Mapping
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(sourceMember => sourceMember.Email.ToUpper()))
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(sourceMember => sourceMember.UserName.ToUpper()))
                 .ReverseMap();
+            // Area
+
+            CreateMap<Area, SelectListItem>()
+               .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
+               .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
+            // governorate
+            CreateMap<Governorate, SelectListItem>()
+             .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
+             .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
 
             // Subscriper
             CreateMap<SubscriperFormViewModel, Subscriper>()
@@ -50,19 +59,15 @@ namespace Bookify.Web.Core.Mapping
                 .ForMember(dest => dest.Area, opt => opt.MapFrom(sourceMember => sourceMember.Area!.Name))
                 .ForMember(dest => dest.Governorate, opt => opt.MapFrom(sourceMember => sourceMember.Governorate!.Name));
             CreateMap<Subscriper, SubscriperSearchResultViewModel>()
-            .ForMember(destination => destination.FullName,options => options.MapFrom(source => source.FirstName + " " + source.LastName)).ReverseMap();
+            .ForMember(destination => destination.FullName, options => options.MapFrom(source => source.FirstName + " " + source.LastName)).ReverseMap();
 
+            // Subscription
+            CreateMap<Subscription, SubscriptionViewModel>();
 
+            // Rentals
+            CreateMap<Rental, RentalViewModel>();
+            CreateMap<RentalCopy, RentalCopyViewModel>();
 
-
-            // Area
-            CreateMap<Area, SelectListItem>()
-               .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
-               .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
-            // governorate
-            CreateMap<Governorate, SelectListItem>()
-             .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember => sourceMember.Id))
-             .ForMember(dest => dest.Text, opt => opt.MapFrom(sourceMember => sourceMember.Name));
 
         }
     }

@@ -10,6 +10,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.DataProtection;
 using WhatsAppCloudApi.Extensions;
+using Hangfire;
+using Hangfire.Dashboard;
+using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Bookify.Web
 {
@@ -46,8 +51,18 @@ namespace Bookify.Web
             // Resolve AutoMapper
             builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
             builder.Services.AddExpressiveAnnotations();
-
+            // Data Prodection
             builder.Services.AddDataProtection().SetApplicationName(nameof(Bookify));
+            // Hangfire
+            builder.Services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
+            builder.Services.AddHangfireServer();
+            builder.Services.Configure<AuthorizationOptions>(Option => Option.AddPolicy("adminsOnly", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole(AppRoles.Admin);
+                }));
+
+
 
             var app = builder.Build();
 
@@ -79,6 +94,15 @@ namespace Bookify.Web
             await DefalutRoles.SeedRoles(roleManager);
             await DefalutUsers.SeedUsers(userManager);
 
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                DashboardTitle = "Bookify Dashboard",
+                IsReadOnlyFunc = (DashboardContext context) => true,
+                Authorization = new IDashboardAuthorizationFilter[]
+                {
+                    new HangfireAuthorizationFilter("adminsOnly")
+                }
+            });
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

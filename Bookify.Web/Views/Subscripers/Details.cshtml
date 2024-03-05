@@ -1,6 +1,9 @@
 ﻿@model SubscriperViewModel
 @{
     ViewData["Title"] = $"{Model.FirstName} Details";
+    var lastsubscription = Model.Subscriptions.Last();
+    var subscriperStatus = Model.IsBlackListed ? "Banned" : lastsubscription.EndDate < DateTime.Today ? "Inactive" : "Active";
+    var statusClass = Model.IsBlackListed ? "danger" : lastsubscription.EndDate < DateTime.Today ? "warning" : "success";
 }
 
 
@@ -12,7 +15,7 @@
         <div class="page-title d-flex flex-column me-3">
             <!--begin::Title-->
             <h1 class="d-flex text-gray-900 fw-bold my-1 fs-3">
-                Customer Details
+                Subscriper Details
             </h1>
             <!--end::Title-->
         </div>
@@ -67,7 +70,7 @@
                             </div>
 
                             <!--begin::Badge-->
-                            <div class="badge badge-light-success d-inline">Active customer</div>
+                            <div class="badge badge-light-@statusClass d-inline" id="StatusBadge">@subscriperStatus Subscriper</div>
                             <!--begin::Badge-->
                         </div>
                         <!--end::Details toggle-->
@@ -144,7 +147,8 @@
                                     <div class="card-body pt-0">
                                         <div class="fw-bold fs-2">
                                             <div class="d-flex">
-                                                <i class="ki-duotone ki-heart text-info fs-2x"><span class="path1"></span><span class="path2"></span></i>                <div class="ms-2">
+                                                <i class="bi bi-bag-heart text-info fs-2x"></i>
+                                                <div class="ms-2">
                                                     4,571 <span class="text-muted fs-4 fw-semibold">Points earned</span>
                                                 </div>
                                             </div>
@@ -158,12 +162,12 @@
 
                             <div class="col">
                                 <!--begin::Reward Tier-->
-                                <a class="card bg-success hoverable h-md-100">
+                                <a class="card bg-@statusClass hoverable h-md-100" id="RewardClass">
                                     <!--begin::Body-->
                                     <div class="card-body">
-                                        <i class="ki-duotone ki-award text-white fs-3x ms-n1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                        <div class="text-white fw-bold fs-2 mt-5">
-                                            Active Subscriper
+                                        <i class="bi bi-star-fill text-white fs-3x ms-n1"></i>
+                                        <div class="text-white fw-bold fs-2 mt-5" id="RewardStutes">
+                                            @subscriperStatus Subscriper 
                                         </div>
 
                                         <div class="fw-semibold text-white">
@@ -175,22 +179,50 @@
                                 <!--end::Reward Tier-->
                             </div>
                         </div>
-
-
                         <!--begin::Card-->
                         <div class="card pt-4 mb-6 mb-xl-9">
                             <!--begin::Card header-->
-                            <div class="card-header border-0">
-                                <!--begin::Card title-->
-                                <div class="card-title">
-                                    <h2>Renewal History</h2>
-                                </div>
-                                <!--end::Card title-->
+                            <div class="card-header border-0 pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 mb-1">Renewal History</span>
+                                </h3>
+                                @if (!Model.IsBlackListed)
+                                {
+                                    <div class="card-toolbar">
+                                        <a href="javascript:;" class="btn btn-sm btn-light-primary js-renew" data-key="@Model.Key">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                            Renew
+                                        </a>
+                                    </div>
+                                }
                             </div>
-                            <!--end::Card header-->
+                            <!--end::Card header--> 
                             <!--begin::Card body-->
-                            <div class="card-body pt-0 pb-5">
-                                Renewal History will show here
+                            <div class="card-body py-3">
+                                <div class="table-responsive">
+                                    <!--begin::Table-->
+                                    <table class="table align-middle gs-0 gy-4" id="subscriptionTable">
+                                        <!--begin::Table head-->
+                                        <thead>
+                                            <tr class="fw-bold text-muted bg-light">
+                                                <th class="ps-4 min-w-125px rounded-start">Start Date</th>
+                                                <th class="min-w-125px">End Date</th>
+                                                <th class="min-w-150px">Status</th>
+                                                <th class="min-w-125px">Add On</th>
+                                            </tr>
+                                        </thead>
+                                        <!--end::Table head-->
+                                        <!--begin::Table body-->
+                                        <tbody>
+                                            @foreach (var subscription in Model.Subscriptions)
+                                            {
+                                                <partial name="_SubscriptionRow" model="subscription" />
+                                            }
+                                        </tbody>
+                                        <!--end::Table body-->
+                                    </table>
+                                    <!--end::Table-->
+                                </div>
                             </div>
                             <!--end::Card body-->
                         </div>
@@ -227,3 +259,8 @@
         <!--end::Layout-->
 
     </div>
+
+    @section Scripts
+    {
+        <script src="~/js/renew.js"></script>
+    }
