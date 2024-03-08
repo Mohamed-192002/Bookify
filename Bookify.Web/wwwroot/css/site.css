@@ -20,3 +20,9 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.form-floating > .form-select {
+    padding-top: 2.15rem;
+    padding-bottom: 0.325rem;
+}

@@ -1,0 +1,244 @@
+﻿@page
+@using System.Security.Claims;
+@inject IWebHostEnvironment WebHostEnvironment
+@model IndexModel
+@{
+    ViewData["Title"] = "Account Settings";
+    Layout = "/Views/Shared/_Layout.cshtml";
+
+    var avatarURL = $"{WebHostEnvironment.WebRootPath}/Images/Users/{User.FindFirst(ClaimTypes.NameIdentifier)!.Value}.png";
+    if (System.IO.File.Exists(avatarURL))
+        avatarURL = $"/Images/Users/{User.FindFirst(ClaimTypes.NameIdentifier)!.Value}.png";
+    else
+        avatarURL = "/assets/images/avatar.png";
+}
+
+<div class="content flex-column-fluid" id="kt_content">
+
+    <!--begin::Navbar-->
+    <div class="card mb-5 mb-xl-10">
+        <div class="card-body pt-9 pb-0">
+            <!--begin::Details-->
+            <div class="d-flex flex-wrap flex-sm-nowrap">
+                <!--begin: Pic-->
+                <div class="me-7 mb-4">
+                    <div class="symbol symbol-50px symbol-lg-100px symbol-fixed position-relative">
+                        <img src="@avatarURL" alt="image">
+                        <div class="position-absolute translate-middle bottom-0 start-100 mb-6 bg-success rounded-circle border border-4 border-body h-20px w-20px"></div>
+                    </div>
+                </div>
+                <!--end::Pic-->
+                <!--begin::Info-->
+                <div class="flex-grow-1">
+                    <!--begin::Title-->
+                    <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                        <!--begin::User-->
+                        <div class="d-flex flex-column">
+                            <!--begin::Name-->
+                            <div class="d-flex align-items-center mb-2">
+                                <a href="#" class="text-gray-900 text-hover-primary fs-2 fw-bold me-1">@User.FindFirst(ClaimTypes.GivenName)!.Value</a>
+                            </div>
+                            <!--end::Name-->
+                            <!--begin::Info-->
+                            <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
+                                <a href="#" class="d-flex align-items-center text-gray-500 text-hover-primary mb-2">
+                                    <i class="ki-duotone ki-sms fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                    @User.FindFirst(ClaimTypes.Email)!.Value
+                                </a>
+                            </div>
+                            <!--end::Info-->
+                        </div>
+                        <!--end::User-->
+                    </div>
+                    <!--end::Title-->
+                </div>
+                <!--end::Info-->
+            </div>
+            <!--end::Details-->
+        </div>
+    </div>
+    <!--end::Navbar-->
+    <!--begin::Basic info-->
+    <div class="card mb-5 mb-xl-10">
+        <!--begin::Card header-->
+        <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
+            <!--begin::Card title-->
+            <div class="card-title m-0">
+                <h3 class="fw-bold m-0">Profile Details</h3>
+            </div>
+            <!--end::Card title-->
+        </div>
+        <!--begin::Card header-->
+        <!--begin::Content-->
+        <div id="kt_account_settings_profile_details" class="collapse show">
+            <!--begin::Form-->
+            <form class="form fv-plugins-bootstrap5 fv-plugins-framework" method="post" enctype="multipart/form-data">
+
+                <!--begin::Card body-->
+                <div class="card-body border-top p-9">
+                    <partial name="_StatusMessage" for="StatusMessage" />
+                    <input type="hidden" asp-for="Input.AvatarDeleted" />
+                    <!--begin::Input group-->
+                    <div class="row mb-6">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 col-form-label fw-semibold fs-6">Avatar</label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <!--begin::Image input-->
+                            <div class="image-input image-input-outline" data-kt-image-input="true" style="background-image: url('/assets/images/avatar.png')">
+                                <!--begin::Preview existing avatar-->
+                                <div class="image-input-wrapper w-125px h-125px" style="background-image: url(@avatarURL)"></div>
+                                <!--end::Preview existing avatar-->
+                                <!--begin::Label-->
+                                <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" aria-label="Change avatar" data-bs-original-title="Change avatar" data-kt-initialized="1">
+                                    <i class="bi bi-pencil-fill"></i>
+                                    <!--begin::Inputs-->
+                                    <input type="file" asp-for="Input.Avatar" accept=".png, .jpg, .jpeg">
+                                    <input type="hidden" asp-for="Input.Avatar">
+                                    <!--end::Inputs-->
+                                </label>
+                                <!--end::Label-->
+                                <!--begin::Cancel-->
+                                <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" aria-label="Cancel avatar" data-bs-original-title="Cancel avatar" data-kt-initialized="1">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </span>
+                                <!--end::Cancel-->
+                                <!--begin::Remove-->
+                                <span id="remove" class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" aria-label="Remove avatar" data-bs-original-title="Remove avatar" data-kt-initialized="1">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </span>
+                                <!--end::Remove-->
+                            </div>
+                            <!--end::Image input-->
+                            <!--begin::Hint-->
+                            <div class="form-text">Allowed file types:  png. , .jpg , .jpeg</div>
+                            <span class="text-denger" asp-validation-for="Input.Avatar"></span>
+                            <!--end::Hint-->
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Input group-->
+                    <div class="row mb-6">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 col-form-label required fw-semibold fs-6" asp-for="Input.FullName"></label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <!--begin::Row-->
+                            <div class="row">
+                                <!--begin::Col-->
+                                <div class="fv-row fv-plugins-icon-container">
+                                    <input type="text" asp-for="Input.FullName" class="form-control form-control-lg form-control-solid" placeholder="Full Name">
+                                    <span asp-validation-for="Input.FullName" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></span>
+
+                                </div>
+                                <!--end::Col-->
+                            </div>
+                            <!--end::Row-->
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Input group-->
+                    <div class="row mb-6">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 col-form-label required fw-semibold fs-6" asp-for="Input.PhoneNumber"></label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <!--begin::Row-->
+                            <div class="row">
+                                <!--begin::Col-->
+                                <div class="fv-row fv-plugins-icon-container">
+                                    <input type="text" asp-for="Input.PhoneNumber" class="form-control form-control-lg form-control-solid" placeholder="Phone Number">
+                                    <span asp-validation-for="Input.PhoneNumber" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></span>
+                                </div>
+                                <!--end::Col-->
+                            </div>
+                            <!--end::Row-->
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <!--end::Card body-->
+                <!--begin::Actions-->
+                <div class="card-footer d-flex justify-content-end py-6 px-9">
+                    <button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>
+                    <button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>
+                </div>
+                <!--end::Actions-->
+            </form>
+            <!--end::Form-->
+        </div>
+        <!--end::Content-->
+    </div>
+    <!--end::Basic info-->
+    <!--begin::Sign-in Method-->
+    <div class="card  mb-5 mb-xl-10">
+        <!--begin::Card header-->
+        <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_signin_method">
+            <div class="card-title m-0">
+                <h3 class="fw-bold m-0">Sign-in Method</h3>
+            </div>
+        </div>
+        <!--end::Card header-->
+        <!--begin::Content-->
+        <div id="kt_account_settings_signin_method" class="collapse show">
+            <!--begin::Card body-->
+            <div class="card-body border-top p-9">
+                <!--begin::Email Address-->
+                <div class="d-flex flex-wrap align-items-center">
+                    <!--begin::Label-->
+                    <div id="kt_signin_email">
+                        <div class="fs-6 fw-bold mb-1">Email Address</div>
+                        <div class="fw-semibold text-gray-600">@User.FindFirst(ClaimTypes.Email)!.Value</div>
+                    </div>
+                    <!--end::Label-->
+                    <!--begin::Action-->
+                    <div id="kt_signin_email_button" class="ms-auto">
+                        <a asp-page="./Email" class="btn btn-light btn-active-light-primary">Change Email</a>
+                    </div>
+                    <!--end::Action-->
+                </div>
+                <!--end::Email Address-->
+                <!--begin::Separator-->
+                <div class="separator separator-dashed my-6"></div>
+                <!--end::Separator-->
+                <!--begin::Password-->
+                <div class="d-flex flex-wrap align-items-center mb-10">
+                    <!--begin::Label-->
+                    <div id="kt_signin_password">
+                        <div class="fs-6 fw-bold mb-1">Password</div>
+                        <div class="fw-semibold text-gray-600">************</div>
+                    </div>
+                    <!--end::Label-->
+                    <!--begin::Action-->
+                    <div id="kt_signin_password_button" class="ms-auto">
+                        <a asp-page="./ChangePassword" class="btn btn-light btn-active-light-primary">Change Password</a>
+                    </div>
+                    <!--end::Action-->
+                </div>
+                <!--end::Password-->
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Content-->
+    </div>
+    <!--end::Sign-in Method-->
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            $("#remove").click(function () {
+                $('#Input_AvatarDeleted').val(true);
+            });
+        });
+    </script>
+}

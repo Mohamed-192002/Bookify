@@ -1,0 +1,79 @@
+﻿@model UsersFormViewModel
+
+<form asp-action="@(!string.IsNullOrEmpty(Model.Id)? "Edit":"Create")"
+      data-ajax-method="post"
+      data-ajax="true"
+      data-ajax-begin="OnModelBegin"
+      data-ajax-success="OnModelSuccess"
+      data-ajax-failure="ShowMessageError"
+      data-ajax-complete="OnModelComplete">
+    @if (!string.IsNullOrEmpty(Model.Id))
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+    <!--begin::Input group-->
+    <div class="form-floating mb-7">
+        <input type="text" class="form-control form-control-solid" asp-for="FullName" placeholder="Name" autocomplete="off" />
+        <label asp-for="FullName"></label>
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    <!--end::Input group-->
+    <!--begin::Input group-->
+    <div class="form-floating mb-7">
+        <input type="text" class="form-control form-control-solid" asp-for="UserName" placeholder="Name" autocomplete="off" />
+        <label asp-for="UserName"></label>
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <!--end::Input group-->
+    <!--begin::Input group-->
+    <div class="form-floating mb-7">
+        <input type="text" class="form-control form-control-solid" asp-for="Email" placeholder="Name" autocomplete="off" />
+        <label asp-for="Email"></label>
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <!--end::Input group-->
+
+    <div class="form-floating mb-7">
+        <select class="form-select form-select-solid form-select-solid js-data-ajax" asp-for="SelectedRoles" asp-items="@Model.Roles" data-control="select2" data-close-on-select="false" data-placeholder="Select Roles" data-allow-clear="true" multiple="multiple">
+        </select>
+        <label asp-for="SelectedRoles"></label>
+        <span asp-validation-for="SelectedRoles" class="text-danger"></span>
+    </div>
+    @if (string.IsNullOrEmpty(Model.Id))
+    {
+        <!--begin::Input group-->
+        <div class="form-floating mb-7">
+            <input type="text" class="form-control form-control-solid" asp-for="Password" placeholder="Name" autocomplete="off" />
+            <label asp-for="Password"></label>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <!--end::Input group-->
+        <!--begin::Input group-->
+        <div class="form-floating mb-7">
+            <input type="text" class="form-control form-control-solid" asp-for="ConfirmPassword" placeholder="Confirm Password" autocomplete="off" />
+            <label asp-for="ConfirmPassword"></label>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        <!--end::Input group-->
+    }
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary">
+            @if (string.IsNullOrEmpty(Model.Id))
+            {
+                <i class="bi bi-patch-plus-fill"></i>
+            }
+            else
+            {
+                <i class="bi bi-pencil-fill"></i>
+            }
+            Save
+        </button>
+    </div>
+</form>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+}
+

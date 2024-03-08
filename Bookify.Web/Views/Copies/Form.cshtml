@@ -1,0 +1,51 @@
+﻿@model BookCopyFormViewModel
+
+<form asp-action="@(Model.Id>0? "Edit":"Create")"
+      data-ajax-method="post"
+      data-ajax="true"
+      data-ajax-begin="OnModelBegin"
+      data-ajax-success="@(Model.Id>0? "OnEditCopyModelSuccess":"OnAddCopyModelSuccess")"
+      data-ajax-failure="ShowMessageError"
+      data-ajax-complete="OnModelComplete">
+
+    <input type="hidden" asp-for="BookId" />
+    @if (@Model.Id > 0)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+    <!--begin::Input group-->
+    <div class="form-floating mb-7">
+        <input type="text" class="form-control" asp-for="EditionNumber" value="@(Model.Id>0? Model.EditionNumber:string.Empty)" placeholder="Name" />
+        <label asp-for="EditionNumber"></label>
+        <span asp-validation-for="EditionNumber" class="text-danger"></span>
+    </div>
+    @if (Model.ShowAvaliableButton)
+    {
+        <div class="form-floating mb-7">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" asp-for="IsAvilableForRental">
+                <label class="form-check-label" asp-for="IsAvilableForRental"></label>
+            </div>
+            <span asp-validation-for="IsAvilableForRental" class="text-danger"></span>
+        </div>
+    }
+    <!--end::Input group-->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary">
+            @if (Model.Id == 0)
+            {
+                <i class="bi bi-patch-plus-fill"></i>
+            }
+            else
+            {
+                <i class="bi bi-pencil-fill"></i>
+            }
+            Save
+        </button>
+    </div>
+</form>
+
+@section Plugins{
+    <script src="~/assets/plugins/fslightbox/fslightbox.bundle.js"></script>
+}

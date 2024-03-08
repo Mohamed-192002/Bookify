@@ -1,9 +1,8 @@
-﻿using Bookify.Web.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
 
 namespace Bookify.Web.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -17,7 +16,7 @@ namespace Bookify.Web.Controllers
         {
             return View();
         }
-
+       
         public IActionResult Privacy()
         {
             return View();

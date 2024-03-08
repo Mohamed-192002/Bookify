@@ -1,0 +1,150 @@
+﻿@model BookFormViewModel
+
+@{
+    ViewData["Title"] = "Book Form";
+}
+
+<div class="d-flex justify-content-center mb-5">
+    <h5 class="mb-1">@(Model.Id > 0 ? "Edit" : "Create") Book</h5>
+</div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-controller="Books" method="post" enctype="multipart/form-data">
+            @if (Model.Id > 0)
+            {
+                <input type="hidden" asp-for="Id" />
+            }
+            <!--begin::Image input-->
+            <div class="image-input image-input-empty mb-6" data-kt-image-input="true" style="background-image: url(@(string.IsNullOrEmpty(Model.ImageUrl)?"/Images/image-placeholder.jpg":Model.ImageUrl))">
+                <!--begin::Image preview wrapper-->
+                <div class="image-input-wrapper w-125px h-200px"></div>
+                <!--end::Image preview wrapper-->
+                <!--begin::Edit button-->
+                <label class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" @* url(@(string.IsNullOrEmpty(Model.ImageUrl)?" /Images/image-placeholder.jpg":Model.ImageUrl))" *@
+                       data-kt-image-input-action="change"
+                       data-bs-dismiss="click">
+                    <i class="bi bi-pen-fill "></i>
+                    <!--begin::Inputs-->
+                    <input type="file" asp-for="Image" accept=".png, .jpg, .jpeg" />
+                    <input type="hidden" name="avatar_remove" />
+                    <!--end::Inputs-->
+                </label>
+                <!--end::Edit button-->
+                <!--begin::Cancel button-->
+                <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
+                      data-kt-image-input-action="cancel"
+                      data-bs-dismiss="click">
+                    <i class="bi bi-x-circle"></i>
+                </span>
+                <!--end::Cancel button-->
+                <!--begin::Remove button-->
+                <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
+                      data-kt-image-input-action="remove"
+                      data-bs-dismiss="click">
+                    <i class="bi bi-x-circle"></i>
+                </span>
+                <!--end::Remove button-->
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <!--end::Image input-->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <input type="text" class="form-control form-control-solid" asp-for="Title" placeholder="Title" />
+                        <label asp-for="Title"></label>
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <select class="form-select form-select-solid js-select2" data-control="select2" asp-for="AuthorId" asp-items="@Model.Authors" data-placeholder="Select Author">
+                            <option></option>
+                        </select>
+                        <label asp-for="AuthorId"></label>
+                        <span asp-validation-for="AuthorId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <select class="form-select form-select-solid" asp-for="SelectedCategories" asp-items="@Model.Categories" data-control="select2" data-close-on-select="false" data-placeholder="Select Categories" data-allow-clear="true" multiple="multiple">
+                            <option></option>
+                        </select>
+                        <label asp-for="SelectedCategories"></label>
+                        <span asp-validation-for="SelectedCategories" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <input type="text" class="form-control form-control-solid" asp-for="Publisher" placeholder="Publisher" />
+                        <label asp-for="Publisher"></label>
+                        <span asp-validation-for="Publisher" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <input type="date" class="form-control form-control-solid" asp-for="PublishingDate" placeholder="Publishing Date" />
+                        <label asp-for="PublishingDate"></label>
+                        <span asp-validation-for="PublishingDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <input type="text" class="form-control form-control-solid" asp-for="Hall" placeholder="Hall" />
+                        <label asp-for="Hall"></label>
+                        <span asp-validation-for="Hall" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-7">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="IsAvilableForRental">
+                            <label class="form-check-label" asp-for="IsAvilableForRental"></label>
+                        </div>
+                        <span asp-validation-for="IsAvilableForRental" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-2">
+                        <textarea class="form-control form-control-solid" asp-for="Description" rows="8"></textarea>
+                        <label asp-for="Description"></label>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5">
+                <button type="submit" class="btn btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary">
+                    @if (Model.Id == 0)
+                    {
+                        <i class="bi bi-patch-plus-fill"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-pencil-fill"></i>
+                    }
+                    Save
+                </button>
+                <a asp-action="Index" class="btn btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,47 @@
+﻿@model SubscriperSearchResultViewModel
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        @if (Model is null)
+        {
+            <div id="alert" class="alert alert-dismissible bg-light-danger d-flex flex-column flex-sm-row w-100 p-5 mb-10">
+                <!--begin::Icon-->
+                <i class="bi bi-exclamation-square fs-2hx text-danger me-8 mt-2 mb-sm-0"></i>
+                <!--end::Icon-->
+                <!--begin::Content-->
+                <div class="d-flex flex-column pe-0 pe-sm-10">
+                    <h4 class="fw-semibold">This is an alert</h4>
+                    <span>Not exist any subscriper for this search value!</span>
+                    <a class="btn btn-sm btn-primary mt-5" asp-action="Create">
+                        <i class="bi bi-plus"></i>
+                        Add Subscriper
+                    </a>
+                </div>
+                <!--end::Content-->
+            </div>
+        }
+        else
+        {
+            <div class="d-flex justify-content-between">
+                <div class="d-flex flex-column">
+                    <h4>@Model.FullName</h4>
+                    <div>
+                        <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@Model.Key">
+                            <i class="bi bi-plus"></i>
+                            Details
+                        </a>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+                    <!--begin::Image-->
+                    <div class="symbol symbol-100px">
+                        <a href="@Model.ImageUrl">
+                            <img class="mw-50px mw-lg-75px" src="@Model.ImageUrl" alt="@Model.FullName" />
+                        </a>
+                    </div>
+                    <!--end::Image-->
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,13 @@
+﻿@model BookFormViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-floating mb-7">
+            <select class="form-select form-select-solid" asp-for="SelectedCategories" asp-items="@Model.Categories" data-control="select2" data-close-on-select="false" data-placeholder="Select Categories" data-allow-clear="true" multiple="multiple">
+                <option></option>
+            </select>
+            <label asp-for="SelectedCategories"></label>
+            <span asp-validation-for="SelectedCategories" class="text-danger"></span>
+        </div>
+    </div>
+</div>
